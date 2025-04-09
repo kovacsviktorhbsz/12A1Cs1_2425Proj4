@@ -13,3 +13,10 @@ C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogame
 C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.csproj.CoreCompileInputs.cache
 C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.exe
 C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.pdb
+D:\programozas\4.projektmunka\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.csproj.AssemblyReference.cache
+D:\programozas\4.projektmunka\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\MainWindow.g.cs
+D:\programozas\4.projektmunka\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\App.g.cs
+D:\programozas\4.projektmunka\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames_MarkupCompile.cache
+D:\programozas\4.projektmunka\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames_MarkupCompile.lref
+D:\programozas\4.projektmunka\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.exe
+D:\programozas\4.projektmunka\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.pdb

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Videogames.Database;
 
 namespace Videogames
 {
@@ -23,6 +24,15 @@ namespace Videogames
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void LoadGamesButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (var context = new VideoGamesContext())
+            {
+                var games = context.Games.ToList();
+                GamesListBox.ItemsSource = games;
+            }
         }
     }
 }
