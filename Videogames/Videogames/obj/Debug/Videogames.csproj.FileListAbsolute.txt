@@ -1,0 +1,15 @@
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\bin\Debug\Videogames.exe.config
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\bin\Debug\Videogames.exe
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\bin\Debug\Videogames.pdb
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.csproj.AssemblyReference.cache
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\MainWindow.g.cs
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\App.g.cs
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames_MarkupCompile.cache
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames_MarkupCompile.lref
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\MainWindow.baml
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.g.resources
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.Properties.Resources.resources
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.csproj.GenerateResource.cache
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.csproj.CoreCompileInputs.cache
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.exe
+C:\Users\kovacs.viktor\Source\Repos\kovacsviktorhbsz\12A1Cs1_2425Proj4\Videogames\Videogames\obj\Debug\Videogames.pdb
