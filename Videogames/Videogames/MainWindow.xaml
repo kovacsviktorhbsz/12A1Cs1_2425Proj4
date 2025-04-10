@@ -7,6 +7,102 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <ListBox x:Name="GamesListbox" HorizontalAlignment="Left" Height="297" Margin="141,83,0,0" VerticalAlignment="Top" Width="430" SelectionChanged="GamesListbox_SelectionChanged"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <ListBox x:Name="GamesListBox" Grid.Column="0" 
+                 FontSize="20" Margin="20" SelectionChanged="GamesListbox_SelectionChanged"/>
+        <Grid Grid.Column="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition>
+                </RowDefinition>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="Azon:" FontSize="20"
+                       FontWeight="Bold"/>
+            <TextBlock Grid.Column="0" Grid.Row="1"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="Név:" FontSize="20"
+                       FontWeight="Bold"/>
+            <TextBlock Grid.Column="0" Grid.Row="2"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="Kiadási Év:" FontSize="20"
+                       FontWeight="Bold"/>
+            <TextBlock Grid.Column="0" Grid.Row="3"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="Fejlesztők:" FontSize="20"
+                       FontWeight="Bold"/>
+            <TextBlock Grid.Column="0" Grid.Row="4"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="Fejlesztők országa:" FontSize="20"
+                       FontWeight="Bold"/>
+            <TextBlock Grid.Column="0" Grid.Row="5"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="Platform:" FontSize="20"
+                       FontWeight="Bold"/>
+            <TextBlock Grid.Column="0" Grid.Row="6"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="Vélemény:" FontSize="20"
+                       FontWeight="Bold"/>
+            <TextBox Grid.Column="2" Grid.Row="0"
+                     Grid.ColumnSpan="2" x:Name="tbId"
+                     VerticalAlignment="Center" FontSize="20" Margin="5"/>
+            <TextBox Grid.Column="2" Grid.Row="1"
+                     Grid.ColumnSpan="2" x:Name="tbTitle"
+                     VerticalAlignment="Center" FontSize="20" Margin="5" TextChanged="tbTitle_TextChanged"/>
+            <TextBox Grid.Column="2" Grid.Row="2"
+                     Grid.ColumnSpan="2" x:Name="tbReleaseYear"
+                     VerticalAlignment="Center" FontSize="20" Margin="5"/>
+            <TextBox Grid.Column="2" Grid.Row="3"
+                     Grid.ColumnSpan="2" x:Name="tbDeveloper"
+                     VerticalAlignment="Center" FontSize="20" Margin="5"/>
+            <TextBox Grid.Column="2" Grid.Row="4"
+                     Grid.ColumnSpan="2" x:Name="tbCountry"
+                     VerticalAlignment="Center" FontSize="20" Margin="5"/>
+            <TextBox Grid.Column="2" Grid.Row="5"
+                     Grid.ColumnSpan="2" x:Name="tbPlatform"
+                     VerticalAlignment="Center" FontSize="20" Margin="5"/>
+            <TextBox Grid.Column="2" Grid.Row="6"
+                     Grid.ColumnSpan="2" x:Name="tbReview"
+                     VerticalAlignment="Center" FontSize="20" Margin="5,7,5,10" Height="67" Grid.RowSpan="2"/>
+            <Button Grid.Column="0" Grid.Row="8" x:Name="btnCreate"
+                    Content="Create" FontSize="20" Margin="5" Click="btnCreate_Click"/>
+            <Button Grid.Column="1" Grid.Row="8" x:Name="btnRead"
+                    Content="Read" FontSize="20" Margin="5" Click="btnRead_Click"/>
+            <Button Grid.Column="2" Grid.Row="8" x:Name="btnUpdate"
+                    Content="Update" FontSize="20" Margin="5" Click="btnUpdate_Click"/>
+            <Button Grid.Column="3" Grid.Row="8" x:Name="btnDelete"
+                    Content="Delete" FontSize="20" Margin="5" Click="btnDelete_Click"/>
+        </Grid>
     </Grid>
 </Window>
