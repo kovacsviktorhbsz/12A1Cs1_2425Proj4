@@ -17,7 +17,7 @@ namespace Videogames.Database
         public DbSet<Developer> Developers { get; set; }
         public DbSet<Platform> Platforms { get; set; }
         public DbSet<Review> Reviews { get; set; }
-        public DbSet<GamePlatform> GamePlatforms { get; set; }
+        public DbSet<Game_Platform> Game_Platforms { get; set; }
 
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

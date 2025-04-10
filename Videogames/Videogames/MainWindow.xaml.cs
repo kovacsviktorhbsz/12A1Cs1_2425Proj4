@@ -1,5 +1,7 @@
-﻿using System;
+﻿using _4.projektmunka.Models;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,122 +23,112 @@ namespace Videogames
     /// </summary>
     public partial class MainWindow : Window
     {
+        private VideoGamesContext ctx = new VideoGamesContext();
         public MainWindow()
         {
             InitializeComponent();
-            using (var context = new VideoGamesContext())
             {
-                var games = context.Games.ToList();
-                foreach(var item in games)
+                foreach(var item in ctx.Games)
                 {
                     GamesListBox.Items.Add(item.Title);
                 }
             }
         }
-        private void MovieToFields(Movie movie)
+        private void GameToFields(Game game)
         {
-            if (movie == null)
+            if (game == null)
                 return;
-            tbId.Text = movie.Id.ToString();
-            tbTitle.Text = movie.Title;
-            tbYear.Text = movie.Year.ToString();
-            tbDirector.Text = movie.Director;
-            tbCountry.Text = movie.Country.Name;
-            tbLanguage.Text = movie.Language;
-            tbRuntime.Text = movie.Runtime.ToString();
+
+            // Lekérdezed az adatbázisból a játékot, platformokat és véleményeket
+            var gameWithDetails = ctx.Games
+                .Include(g => g.Platforms)   // Betölti a kapcsolódó platformokat
+                .Include(g => g.Reviews)     // Betölti a kapcsolódó véleményeket
+                .FirstOrDefault(g => g.GameID == game.GameID);  // Az aktuálisan kiválasztott játék
+
+            // Ha nem találod a játékot, akkor visszatérsz
+            if (gameWithDetails == null)
+            {
+                tbPlatform.Text = "N/A";
+                tbReview.Text = "N/A";
+                return;
+            }
+
+            // Ha sikerült betölteni, beállítod a mezőket
+            tbId.Text = gameWithDetails.GameID.ToString();
+            tbTitle.Text = gameWithDetails.Title;
+            tbReleaseYear.Text = gameWithDetails.ReleaseYear.ToString();
+            tbDeveloper.Text = gameWithDetails.Developer?.Name ?? "N/A";
+            tbCountry.Text = gameWithDetails.Developer?.Country ?? "N/A";
+
+            // Platformok betöltése
+            tbPlatform.Text = gameWithDetails.Platforms.Any() ? string.Join(", ", gameWithDetails.Platforms.Select(p => p.PlatformName)) : "N/A";
+
+            // Vélemények betöltése
+            tbReview.Text = gameWithDetails.Reviews.Any() ? string.Join("\n", gameWithDetails.Reviews.Select(r => r.Comment)) : "N/A";
         }
 
-        private Movie FieldsToMovie()
+
+        private Game FieldsToGames()
         {
             int year = 0;
-            int runtime = 0;
-            if (tbYear.Text != "")
-                year = int.Parse(tbYear.Text);
-            if (tbRuntime.Text != "")
-                runtime = int.Parse(tbRuntime.Text);
+            if (tbReleaseYear.Text != "")
+                year = int.Parse(tbReleaseYear.Text);
 
-            var country = ctx.Countries.Where(x => x.Name == tbCountry.Text)
-                                        .FirstOrDefault();
+            var developer = ctx.Developers
+                         .FirstOrDefault(x => x.Country == tbCountry.Text);
 
-            var movie = new Movie
+            var platforms = ctx.Platforms
+                         .Where(p => tbPlatform.Text.Contains(p.PlatformName)) 
+                         .ToList();
+
+            var review = new Review
+            {
+                Rating = 8, 
+                Comment = tbReview.Text,
+                UserName = "admin"
+            };
+
+            var game = new Game
             {
                 Title = tbTitle.Text,
-                Year = year,
-                Director = tbDirector.Text,
-                CountryId = country.Id,
-                Country = country,
-                Language = tbLanguage.Text,
-                Runtime = runtime
+                ReleaseYear = year,
+                Developer = developer,
+                DeveloperID = developer?.DeveloperID ?? 0,
+                Reviews = new List<Review> { review },
+                Platforms = platforms
             };
-            return movie;
+            return game;
         }
 
         private void RefreshListBox()
         {
-            lbMovieList.Items.Clear();
-            foreach (var item in ctx.Movies)
+            GamesListBox.Items.Clear();
+            foreach (var item in ctx.Games)
             {
-                lbMovieList.Items.Add(item.Title);
+                GamesListBox.Items.Add(item.Title);
             }
         }
 
-        private void lbMovieList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void GamesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var title = (string)lbMovieList.SelectedItem;
-            var movie = ctx.Movies
-                .Include(x => x.Country)
-                .Where(x => x.Title == title).FirstOrDefault();
-            MovieToFields(movie);
-        }
+            var title = (string)GamesListBox.SelectedItem;
 
-        private void btnRead_Click(object sender, RoutedEventArgs e)
-        {
-            //RefreshListBox();
-            //var id = int.Parse(tbId.Text);
-            //var fields = FieldsToMovie();
-            /*var movie = ctx.Movies
-                           .Include(x => x.Country)
-                           .Where(x => x.Id == id).FirstOrDefault();*/
-            //MovieToFields(movie);
+            var game = ctx.Games
+                .Include(x => x.Developer)
+                .Where(x => x.Title == title)
+                .FirstOrDefault();
 
-            var title = tbTitle.Text;
-            var director = tbDirector.Text;
-            var language = tbLanguage.Text;
-            var country = tbCountry.Text;
-
-            var res = ctx.Movies.Include(x => x.Country)
-                                .Where(x => x.Title.Contains(title) &&
-                                            x.Director.Contains(director) &&
-                                            x.Language.Contains(language) &&
-                                            x.Country.Name.Contains(country)).ToList();
-
-            if (tbYear.Text != "")
-            {
-                var year = int.Parse(tbYear.Text);
-                res = res.Where(x => x.Year == year).ToList();
-            }
-
-            if (tbMin.Text != "" && tbMax.Text != "")
-            {
-                var min = int.Parse(tbMin.Text);
-                var max = int.Parse(tbMax.Text);
-                res = res.Where(x => x.Runtime > min && x.Runtime < max).ToList();
-            }
-
-            lbMovieList.Items.Clear();
-            foreach (var item in res)
-                lbMovieList.Items.Add(item.Title);
-
+            GameToFields(game);
         }
 
         private void btnCreate_Click(object sender, RoutedEventArgs e)
         {
-            var movie = FieldsToMovie();
-            movie = ctx.Movies.Add(movie);
+            var game = FieldsToGames();
+            game = ctx.Games.Add(game);
             ctx.SaveChanges();
-            if (movie != null)
+            if (game != null)
             {
-                MovieToFields(movie);
+                GameToFields(game);
                 RefreshListBox();
             }
 
@@ -145,57 +137,57 @@ namespace Videogames
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
             var id = int.Parse(tbId.Text);
-            var fields = FieldsToMovie();
+            var fields = FieldsToGames();
 
-            var movie = ctx.Movies.Where(x => x.Id == id).FirstOrDefault();
-            if (movie != null)
+            var game = ctx.Games.Where(x => x.GameID == id).FirstOrDefault();
+            if (game != null)
             {
                 if (fields.Title != "")
-                    movie.Title = fields.Title;
-                if (fields.Year != 0)
-                    movie.Year = fields.Year;
-                if (fields.Director != "")
-                    movie.Director = fields.Director;
-                if (fields.Country != null)
-                    movie.Country = fields.Country;
-                if (fields.Language != "")
-                    movie.Language = fields.Language;
-                if (fields.Runtime != 0)
-                    movie.Runtime = fields.Runtime;
+                    game.Title = fields.Title;
+                if (fields.ReleaseYear != 0)
+                    game.ReleaseYear = fields.ReleaseYear;
+                if (fields.Developer != null)
+                    game.Developer = fields.Developer;
+                if (!string.IsNullOrEmpty(fields.Developer.Country))
+                    game.Developer.Country = fields.Developer.Country;
+                if (fields.Platforms != null && fields.Platforms.Any())
+                    game.Platforms = fields.Platforms;
+                if (fields.Reviews != null && fields.Reviews.Any())
+                    game.Reviews = fields.Reviews;
                 ctx.SaveChanges();
                 RefreshListBox();
             }
             else
             {
-                MessageBox.Show("Nincs ilyen azonosítóval film az adatbázisban.");
+                MessageBox.Show("Nincs ilyen azonosítóval játék az adatbázisban.");
             }
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
             var id = int.Parse(tbId.Text);
-            var movie = ctx.Movies.Where(x => x.Id == id).FirstOrDefault();
+            var game = ctx.Games.Where(x => x.GameID == id).FirstOrDefault();
 
-            if (movie != null)
+            if (game != null)
             {
-                ctx.Movies.Remove(movie);
+                ctx.Games.Remove(game);
                 ctx.SaveChanges();
                 RefreshListBox();
             }
             else
             {
-                MessageBox.Show("Nincs ilyen azonosítóval film eltárolva!");
+                MessageBox.Show("Nincs ilyen azonosítóval játék eltárolva!");
             }
         }
 
         private void tbTitle_TextChanged(object sender, TextChangedEventArgs e)
         {
             var title = tbTitle.Text;
-            var res = ctx.Movies.Where(x => x.Title.Contains(title)).ToList();
+            var res = ctx.Games.Where(x => x.Title.Contains(title)).ToList();
 
-            lbMovieList.Items.Clear();
+            GamesListBox.Items.Clear();
             foreach (var item in res)
-                lbMovieList.Items.Add(item.Title);
+                GamesListBox.Items.Add(item.Title);
         }
     }
 }
