@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace _4.projektmunka.Models
 {
-    class Game_Platform
+    class GamePlatform
     {
         [Key]
         [Column(Order = 1)]

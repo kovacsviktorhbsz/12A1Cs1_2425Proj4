@@ -130,7 +130,7 @@
   <ItemGroup>
     <Compile Include="Models\Developer.cs" />
     <Compile Include="Models\Game.cs" />
-    <Compile Include="Models\Game_Platform.cs" />
+    <Compile Include="Models\GamePlatform.cs" />
     <Compile Include="Models\Platform.cs" />
     <Compile Include="Models\Review.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

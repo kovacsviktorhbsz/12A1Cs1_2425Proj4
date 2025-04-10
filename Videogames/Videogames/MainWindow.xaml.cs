@@ -39,13 +39,11 @@ namespace Videogames
             if (game == null)
                 return;
 
-            // Lekérdezed az adatbázisból a játékot, platformokat és véleményeket
             var gameWithDetails = ctx.Games
-                .Include(g => g.Platforms)   // Betölti a kapcsolódó platformokat
-                .Include(g => g.Reviews)     // Betölti a kapcsolódó véleményeket
-                .FirstOrDefault(g => g.GameID == game.GameID);  // Az aktuálisan kiválasztott játék
+                .Include(g => g.Platforms)   
+                .Include(g => g.Reviews)     
+                .FirstOrDefault(g => g.GameID == game.GameID);  
 
-            // Ha nem találod a játékot, akkor visszatérsz
             if (gameWithDetails == null)
             {
                 tbPlatform.Text = "N/A";
@@ -53,17 +51,12 @@ namespace Videogames
                 return;
             }
 
-            // Ha sikerült betölteni, beállítod a mezőket
             tbId.Text = gameWithDetails.GameID.ToString();
             tbTitle.Text = gameWithDetails.Title;
             tbReleaseYear.Text = gameWithDetails.ReleaseYear.ToString();
             tbDeveloper.Text = gameWithDetails.Developer?.Name ?? "N/A";
             tbCountry.Text = gameWithDetails.Developer?.Country ?? "N/A";
-
-            // Platformok betöltése
             tbPlatform.Text = gameWithDetails.Platforms.Any() ? string.Join(", ", gameWithDetails.Platforms.Select(p => p.PlatformName)) : "N/A";
-
-            // Vélemények betöltése
             tbReview.Text = gameWithDetails.Reviews.Any() ? string.Join("\n", gameWithDetails.Reviews.Select(r => r.Comment)) : "N/A";
         }
 
