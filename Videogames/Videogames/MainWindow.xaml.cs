@@ -24,15 +24,28 @@ namespace Videogames
         public MainWindow()
         {
             InitializeComponent();
+            using (var context = new VideoGamesContext())
+            {
+                var games = context.Games.ToList();
+                foreach(var item in games)
+                {
+                    GamesListbox.Items.Add(item.Title);
+                }
+            }
         }
 
-        private void LoadGamesButton_Click(object sender, RoutedEventArgs e)
+        /*private void LoadGamesButton_Click(object sender, RoutedEventArgs e)
         {
             using (var context = new VideoGamesContext())
             {
                 var games = context.Games.ToList();
-                GamesListBox.ItemsSource = games;
+                GamesListBox.Items.Add = games;
             }
+        }*/
+
+        private void GamesListbox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

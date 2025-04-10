@@ -7,19 +7,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <!-- ListBox a játékok megjelenítésére -->
-        <ListBox x:Name="GamesListBox" HorizontalAlignment="Left" Height="200" Margin="10,10,0,0" VerticalAlignment="Top" Width="480">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel>
-                        <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding ReleaseYear}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-
-        <!-- Gomb a játékok betöltésére -->
-        <Button Content="Load Games" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="30" Margin="10,220,0,0" Click="LoadGamesButton_Click"/>
+        <ListBox x:Name="GamesListbox" HorizontalAlignment="Left" Height="297" Margin="141,83,0,0" VerticalAlignment="Top" Width="430" SelectionChanged="GamesListbox_SelectionChanged"/>
     </Grid>
 </Window>
