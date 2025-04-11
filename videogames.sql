@@ -68,7 +68,7 @@ INSERT INTO Review (UserName, GameID, Rating, Comment) VALUES
 ('zsolesz', 1, 10, 'GTA mindig a szívem csücske.');
 
 -- 10. Kapcsoló tábla
-CREATE TABLE Game_Platform (
+CREATE TABLE GamePlatform (
     GameID INT,
     PlatformID INT,
     PRIMARY KEY (GameID, PlatformID),
@@ -78,21 +78,21 @@ CREATE TABLE Game_Platform (
 
 -- 11. Feltöltés: Kapcsoló tábla
 -- GTA V → PC, PS5
-INSERT INTO Game_Platform (GameID, PlatformID) VALUES
+INSERT INTO GamePlatform (GameID, PlatformID) VALUES
 (1, 1), -- PS5
 (1, 4); -- PC
 
 -- Minecraft → PC, Switch
-INSERT INTO Game_Platform (GameID, PlatformID) VALUES
+INSERT INTO GamePlatform (GameID, PlatformID) VALUES
 (2, 3), -- Switch
 (2, 4); -- PC
 
 -- CS:GO → PC
-INSERT INTO Game_Platform (GameID, PlatformID) VALUES
+INSERT INTO GamePlatform (GameID, PlatformID) VALUES
 (3, 4); -- PC
 
 -- Fortnite → PC, PS5, Xbox
-INSERT INTO Game_Platform (GameID, PlatformID) VALUES
+INSERT INTO GamePlatform (GameID, PlatformID) VALUES
 (4, 1), -- PS5
 (4, 2), -- Xbox
 (4, 4); -- PC
