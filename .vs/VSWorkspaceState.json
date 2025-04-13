@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Videogames",
+    "\\Videogames\\Videogames",
+    "\\Videogames\\Videogames\\Models"
   ],
-  "SelectedNode": "\\Videogames.sln",
+  "SelectedNode": "\\Videogames\\Videogames\\Models\\GamePlatform.cs",
   "PreviewInSolutionExplorer": false
 }
