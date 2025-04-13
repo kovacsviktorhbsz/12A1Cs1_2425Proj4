@@ -4,60 +4,68 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Videogames.Database;
 
 namespace Videogames
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private VideoGamesContext ctx = new VideoGamesContext();
         public ObservableCollection<Game> Games { get; set; }
+        private CollectionView view;
+
         public MainWindow()
         {
             InitializeComponent();
-            Games = new ObservableCollection<Game>(ctx.Games.ToList());
+
+            // Eagerly load related entities
+            Games = new ObservableCollection<Game>(ctx.Games
+                .Include(g => g.Platforms)
+                .Include(g => g.Reviews)
+                .Include(g => g.Developer)
+                .ToList());
             GamesListBox.ItemsSource = Games;
+            GamesListBox.DisplayMemberPath = "Title";
+
+            view = (CollectionView)CollectionViewSource.GetDefaultView(GamesListBox.ItemsSource);
+            view.Filter = GameFilter;
         }
+
+        private bool GameFilter(object item)
+        {
+            if (string.IsNullOrWhiteSpace(tbTitle.Text))
+                return true;
+
+            var game = item as Game;
+            return game.Title.ToLower().Contains(tbTitle.Text.ToLower());
+        }
+
+        private void tbTitle_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (view != null)
+                view.Refresh();
+        }
+
         private void GameToFields(Game game)
         {
             if (game == null)
                 return;
 
-            var gameWithDetails = ctx.Games
-                .Include(g => g.Platforms)   
-                .Include(g => g.Reviews)     
-                .FirstOrDefault(g => g.GameID == game.GameID);  
-
-            if (gameWithDetails == null)
-            {
-                tbPlatform.Text = "N/A";
-                tbReview.Text = "N/A";
-                return;
-            }
-
-            tbId.Text = gameWithDetails.GameID.ToString();
-            tbTitle.Text = gameWithDetails.Title;
-            tbReleaseYear.Text = gameWithDetails.ReleaseYear.ToString();
-            tbDeveloper.Text = gameWithDetails.Developer?.Name ?? "N/A";
-            tbCountry.Text = gameWithDetails.Developer?.Country ?? "N/A";
-            tbPlatform.Text = gameWithDetails.Platforms.Any() ? string.Join(", ", gameWithDetails.Platforms.Select(p => p.PlatformName)) : "N/A";
-            tbReview.Text = gameWithDetails.Reviews.Any() ? string.Join("\n", gameWithDetails.Reviews.Select(r => r.Comment)) : "N/A";
+            tbId.Text = game.GameID.ToString();
+            tbTitle.Text = game.Title;
+            tbReleaseYear.Text = game.ReleaseYear.ToString();
+            tbDeveloper.Text = game.Developer?.Name ?? "N/A";
+            tbCountry.Text = game.Developer?.Country ?? "N/A";
+            tbPlatform.Text = game.Platforms.Any()
+                ? string.Join(", ", game.Platforms.Select(p => p.PlatformName))
+                : "N/A";
+            tbReview.Text = game.Reviews.Any()
+                ? string.Join("\n", game.Reviews.Select(r => r.Comment))
+                : "N/A";
         }
-
 
         private Game FieldsToGames()
         {
@@ -65,16 +73,35 @@ namespace Videogames
             if (tbReleaseYear.Text != "")
                 year = int.Parse(tbReleaseYear.Text);
 
-            var developer = ctx.Developers
-                         .FirstOrDefault(x => x.Country == tbCountry.Text);
+            // Find the developer based on the entered country
+            var developer = ctx.Developers.FirstOrDefault(x => x.Country == tbCountry.Text);
+            if (developer == null && !string.IsNullOrWhiteSpace(tbDeveloper.Text) && !string.IsNullOrWhiteSpace(tbCountry.Text))
+            {
+                // If a developer with the given country doesn't exist, create a new one
+                developer = new Developer { Name = tbDeveloper.Text, Country = tbCountry.Text };
+                ctx.Developers.Add(developer);
+                ctx.SaveChanges(); // Save immediately to get the new ID
+            }
 
-            var platforms = ctx.Platforms
-                         .Where(p => tbPlatform.Text.Contains(p.PlatformName)) 
-                         .ToList();
+            // Find existing platforms based on the entered text
+            var platformNames = tbPlatform.Text.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+            var platforms = ctx.Platforms.Where(p => platformNames.Contains(p.PlatformName)).ToList();
+
+            // Create new platforms if they don't exist
+            foreach (var platformName in platformNames)
+            {
+                if (!platforms.Any(p => p.PlatformName == platformName))
+                {
+                    var newPlatform = new Platform { PlatformName = platformName };
+                    ctx.Platforms.Add(newPlatform);
+                    platforms.Add(newPlatform);
+                }
+            }
+            ctx.SaveChanges(); // Save any new platforms
 
             var review = new Review
             {
-                Rating = 8, 
+                Rating = 8,
                 Comment = tbReview.Text,
                 UserName = "admin"
             };
@@ -88,19 +115,31 @@ namespace Videogames
                 Reviews = new List<Review> { review },
                 Platforms = platforms
             };
+
             return game;
         }
 
         private void RefreshListBox()
         {
-            Games = new ObservableCollection<Game>(ctx.Games.ToList());
-            GamesListBox.ItemsSource = Games;
+            Games.Clear();
+            foreach (var game in ctx.Games
+                .Include(g => g.Platforms)
+                .Include(g => g.Reviews)
+                .Include(g => g.Developer)
+                .ToList())
+            {
+                Games.Add(game);
+            }
+            view?.Refresh();
         }
 
         private void GamesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selectedGame = (Game)GamesListBox.SelectedItem;
-            GameToFields(selectedGame);
+            if (selectedGame != null)
+            {
+                GameToFields(selectedGame);
+            }
         }
 
         private void btnCreate_Click(object sender, RoutedEventArgs e)
@@ -108,59 +147,82 @@ namespace Videogames
             var game = FieldsToGames();
             ctx.Games.Add(game);
             ctx.SaveChanges();
-            Games.Add(game);  
-            GameToFields(game);
+            RefreshListBox(); // Refresh the ListBox to show the new game
+            GamesListBox.SelectedItem = game; // Select the newly created game
         }
 
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
-            var id = int.Parse(tbId.Text);
-            var fields = FieldsToGames();
-            var game = ctx.Games.Where(x => x.GameID == id).FirstOrDefault();
+            if (!int.TryParse(tbId.Text, out int id)) return;
 
-            if (game != null)
+            var fields = FieldsToGames();
+            var gameToUpdate = ctx.Games
+                .Include(g => g.Platforms)
+                .Include(g => g.Reviews)
+                .Include(g => g.Developer)
+                .FirstOrDefault(x => x.GameID == id);
+
+            if (gameToUpdate != null)
             {
-                game.Title = fields.Title;
-                game.ReleaseYear = fields.ReleaseYear;
-                game.Developer = fields.Developer;
-                game.Developer.Country = fields.Developer.Country;
-                game.Platforms = fields.Platforms;
-                game.Reviews = fields.Reviews;
+                gameToUpdate.Title = fields.Title;
+                gameToUpdate.ReleaseYear = fields.ReleaseYear;
+
+                // Update or create developer
+                if (fields.Developer != null)
+                {
+                    gameToUpdate.Developer = fields.Developer;
+                    gameToUpdate.DeveloperID = fields.Developer.DeveloperID;
+                }
+
+                // Update platforms
+                gameToUpdate.Platforms.Clear();
+                foreach (var platform in fields.Platforms)
+                {
+                    gameToUpdate.Platforms.Add(platform);
+                }
+
+                // Update reviews (assuming only one review for simplicity)
+                if (fields.Reviews.Any())
+                {
+                    if (gameToUpdate.Reviews.Any())
+                    {
+                        gameToUpdate.Reviews.First().Comment = fields.Reviews.First().Comment;
+                        gameToUpdate.Reviews.First().Rating = fields.Reviews.First().Rating;
+                        gameToUpdate.Reviews.First().UserName = fields.Reviews.First().UserName;
+                    }
+                    else
+                    {
+                        gameToUpdate.Reviews.Add(fields.Reviews.First());
+                    }
+                }
+
                 ctx.SaveChanges();
-                GamesListBox.ItemsSource = new ObservableCollection<Game>(ctx.Games.ToList()); // Automatikusan frissíti a ListBox-ot
+                RefreshListBox();
+                GamesListBox.SelectedItem = Games.FirstOrDefault(g => g.GameID == id);
             }
             else
             {
-                MessageBox.Show("Nincs ilyen azonosítóval film eltárolva!");
+                MessageBox.Show("Nincs ilyen azonosítóval játék!");
             }
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            var id = int.Parse(tbId.Text);
-            var game = ctx.Games.Where(x => x.GameID == id).FirstOrDefault();
+            if (!int.TryParse(tbId.Text, out int id)) return;
 
-            if (game != null)
+            var gameToDelete = ctx.Games.FirstOrDefault(x => x.GameID == id);
+            if (gameToDelete != null)
             {
-                ctx.Games.Remove(game);
+                ctx.Games.Remove(gameToDelete);
                 ctx.SaveChanges();
-                RefreshListBox();
+                Games.Remove(gameToDelete);
+                view.Refresh();
+                // Optionally clear the fields after deletion
+                GameToFields(null);
             }
             else
             {
-                MessageBox.Show("Nincs ilyen azonosítóval játék eltárolva!");
-            }
-        }
-
-        private void tbTitle_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            var title = tbTitle.Text;
-            var res = ctx.Games.Where(x => x.Title.Contains(title)).ToList();
-
-            Games.Clear();
-            foreach (var item in res)
-            {
-                Games.Add(item);
+                MessageBox.Show("Nincs ilyen azonosítóval játék!");
             }
         }
     }
