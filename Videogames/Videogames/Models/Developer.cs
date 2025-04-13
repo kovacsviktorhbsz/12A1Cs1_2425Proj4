@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace _4.projektmunka.Models
 {
-    class Developer
+    public class Developer
     {
         public int DeveloperID { get; set; }
         public string Name { get; set; }

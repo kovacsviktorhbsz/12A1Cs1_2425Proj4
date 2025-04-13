@@ -1,6 +1,7 @@
 ﻿using _4.projektmunka.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
@@ -24,15 +25,12 @@ namespace Videogames
     public partial class MainWindow : Window
     {
         private VideoGamesContext ctx = new VideoGamesContext();
+        public ObservableCollection<Game> Games { get; set; }
         public MainWindow()
         {
             InitializeComponent();
-            {
-                foreach(var item in ctx.Games)
-                {
-                    GamesListBox.Items.Add(item.Title);
-                }
-            }
+            Games = new ObservableCollection<Game>(ctx.Games.ToList());
+            GamesListBox.ItemsSource = Games;
         }
         private void GameToFields(Game game)
         {
@@ -95,64 +93,45 @@ namespace Videogames
 
         private void RefreshListBox()
         {
-            GamesListBox.Items.Clear();
-            foreach (var item in ctx.Games)
-            {
-                GamesListBox.Items.Add(item.Title);
-            }
+            Games = new ObservableCollection<Game>(ctx.Games.ToList());
+            GamesListBox.ItemsSource = Games;
         }
 
         private void GamesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var title = (string)GamesListBox.SelectedItem;
-
-            var game = ctx.Games
-                .Include(x => x.Developer)
-                .Where(x => x.Title == title)
-                .FirstOrDefault();
-
-            GameToFields(game);
+            var selectedGame = (Game)GamesListBox.SelectedItem;
+            GameToFields(selectedGame);
         }
 
         private void btnCreate_Click(object sender, RoutedEventArgs e)
         {
             var game = FieldsToGames();
-            game = ctx.Games.Add(game);
+            ctx.Games.Add(game);
             ctx.SaveChanges();
-            if (game != null)
-            {
-                GameToFields(game);
-                RefreshListBox();
-            }
-
+            Games.Add(game);  
+            GameToFields(game);
         }
 
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
             var id = int.Parse(tbId.Text);
             var fields = FieldsToGames();
-
             var game = ctx.Games.Where(x => x.GameID == id).FirstOrDefault();
+
             if (game != null)
             {
-                if (fields.Title != "")
-                    game.Title = fields.Title;
-                if (fields.ReleaseYear != 0)
-                    game.ReleaseYear = fields.ReleaseYear;
-                if (fields.Developer != null)
-                    game.Developer = fields.Developer;
-                if (!string.IsNullOrEmpty(fields.Developer.Country))
-                    game.Developer.Country = fields.Developer.Country;
-                if (fields.Platforms != null && fields.Platforms.Any())
-                    game.Platforms = fields.Platforms;
-                if (fields.Reviews != null && fields.Reviews.Any())
-                    game.Reviews = fields.Reviews;
+                game.Title = fields.Title;
+                game.ReleaseYear = fields.ReleaseYear;
+                game.Developer = fields.Developer;
+                game.Developer.Country = fields.Developer.Country;
+                game.Platforms = fields.Platforms;
+                game.Reviews = fields.Reviews;
                 ctx.SaveChanges();
-                RefreshListBox();
+                GamesListBox.ItemsSource = new ObservableCollection<Game>(ctx.Games.ToList()); // Automatikusan frissíti a ListBox-ot
             }
             else
             {
-                MessageBox.Show("Nincs ilyen azonosítóval játék az adatbázisban.");
+                MessageBox.Show("Nincs ilyen azonosítóval film eltárolva!");
             }
         }
 
@@ -178,9 +157,11 @@ namespace Videogames
             var title = tbTitle.Text;
             var res = ctx.Games.Where(x => x.Title.Contains(title)).ToList();
 
-            GamesListBox.Items.Clear();
+            Games.Clear();
             foreach (var item in res)
-                GamesListBox.Items.Add(item.Title);
+            {
+                Games.Add(item);
+            }
         }
     }
 }

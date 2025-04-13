@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace _4.projektmunka.Models
 {
-    class Review
+    public class Review
     {
         public int ReviewID { get; set; }
         public string UserName { get; set; }
