@@ -21,7 +21,6 @@ namespace Videogames
         {
             InitializeComponent();
 
-            // Eagerly load related entities
             Games = new ObservableCollection<Game>(ctx.Games
                 .Include(g => g.Platforms)
                 .Include(g => g.Reviews)
@@ -73,21 +72,17 @@ namespace Videogames
             if (tbReleaseYear.Text != "")
                 year = int.Parse(tbReleaseYear.Text);
 
-            // Find the developer based on the entered country
             var developer = ctx.Developers.FirstOrDefault(x => x.Country == tbCountry.Text);
             if (developer == null && !string.IsNullOrWhiteSpace(tbDeveloper.Text) && !string.IsNullOrWhiteSpace(tbCountry.Text))
             {
-                // If a developer with the given country doesn't exist, create a new one
                 developer = new Developer { Name = tbDeveloper.Text, Country = tbCountry.Text };
                 ctx.Developers.Add(developer);
-                ctx.SaveChanges(); // Save immediately to get the new ID
+                ctx.SaveChanges();
             }
 
-            // Find existing platforms based on the entered text
             var platformNames = tbPlatform.Text.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
             var platforms = ctx.Platforms.Where(p => platformNames.Contains(p.PlatformName)).ToList();
 
-            // Create new platforms if they don't exist
             foreach (var platformName in platformNames)
             {
                 if (!platforms.Any(p => p.PlatformName == platformName))
@@ -97,7 +92,7 @@ namespace Videogames
                     platforms.Add(newPlatform);
                 }
             }
-            ctx.SaveChanges(); // Save any new platforms
+            ctx.SaveChanges(); 
 
             var review = new Review
             {
@@ -147,8 +142,8 @@ namespace Videogames
             var game = FieldsToGames();
             ctx.Games.Add(game);
             ctx.SaveChanges();
-            RefreshListBox(); // Refresh the ListBox to show the new game
-            GamesListBox.SelectedItem = game; // Select the newly created game
+            RefreshListBox(); 
+            GamesListBox.SelectedItem = game; 
         }
 
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
@@ -167,21 +162,18 @@ namespace Videogames
                 gameToUpdate.Title = fields.Title;
                 gameToUpdate.ReleaseYear = fields.ReleaseYear;
 
-                // Update or create developer
                 if (fields.Developer != null)
                 {
                     gameToUpdate.Developer = fields.Developer;
                     gameToUpdate.DeveloperID = fields.Developer.DeveloperID;
                 }
 
-                // Update platforms
                 gameToUpdate.Platforms.Clear();
                 foreach (var platform in fields.Platforms)
                 {
                     gameToUpdate.Platforms.Add(platform);
                 }
 
-                // Update reviews (assuming only one review for simplicity)
                 if (fields.Reviews.Any())
                 {
                     if (gameToUpdate.Reviews.Any())
@@ -217,7 +209,6 @@ namespace Videogames
                 ctx.SaveChanges();
                 Games.Remove(gameToDelete);
                 view.Refresh();
-                // Optionally clear the fields after deletion
                 GameToFields(null);
             }
             else
